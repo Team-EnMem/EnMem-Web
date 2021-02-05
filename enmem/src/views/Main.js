@@ -31,11 +31,8 @@ class Main extends React.Component {
             isHomePage: true,
             isLoadingPage: false,
             isResultPage: false,
-            photo: {
-                preview: "",
-                raw: "",
-            },
-            video: {
+            file: {
+                fileName: "",
                 preview: "",
                 raw: "",
             },
@@ -48,14 +45,16 @@ class Main extends React.Component {
         return new Promise(resolve => setTimeout(resolve, milliseconds))
     }
     
-    handleChangePhoto = (e) => {
+    handleChangeFile = (e) => {
         if (!e.target.files) {
             console.log("err!")
             return
         }
         if (e.target.files.length) {
+            const fileName = this.generateRandomFileName()
             this.setState({
-                photo: {
+                file: {
+                    fileName,
                     preview: URL.createObjectURL(e.target.files[0]),
                     raw: e.target.files[0]
                 }
@@ -63,38 +62,24 @@ class Main extends React.Component {
         }
     };
 
-    handleChangeVideo = (e) => {
-        if (!e.target.files) {
-            console.log("err!")
+    handleUploadFile = (e) => {
+        e.preventDefault();
+        const {file} = this.state
+        
+        if (this.checkFileSize({fileSize: file.raw.size})) {
+            alert("파일의 사이즈가 너무 큽니다! 10M이하로 넣어주세요");
             return
         }
-        if (e.target.files.length) {
-            this.setState({
-                video: {
-                    preview: URL.createObjectURL(e.target.files[0]),
-                    raw: e.target.files[0],
-                }
-            })
-        }
-    };
-    
-    handleUploadPhoto = async (e) => {
-        e.preventDefault();
-        const {photo} = this.state
-        const fileName = this.generateRandomFileName()
-        this.uploadFile({file: photo.raw, fileName: fileName, completion: this.getResponseFromServer})
+        this.uploadFile({file: file.raw, fileName: file.fileName, completion: this.getResponseFromServer})
     };
 
-    handleUploadVideo = async (e) => {
-        e.preventDefault();
-        const {video} = this.state
-        const fileName = this.generateRandomFileName()
-        this.setState({
-            isLoadingPage: true,
-        })
-        this.uploadFile({file: video.raw, fileName: fileName, completion: this.getResponseFromServer})
-        await this.sleep(3000)
-    };
+    checkFileSize = ({fileSize}) => {
+        const maxFileSize = 10 * 1024 * 1024;
+        if (fileSize > maxFileSize) {
+            return true
+        }
+        return false
+    }
 
     generateRandomFileName = () => {
         return `${Math.floor(Math.random() * 100000000)}`;
@@ -132,18 +117,16 @@ class Main extends React.Component {
     }
 
     returnHomePage = () => {
-        const {photo, video} = this.state;
-        const photoPreviewURL = photo.preview;
-        const videoPreviewURL = video.preview;
+        const {file} = this.state;
+        const filePreviewURL = file.preview;
+        const fileName = file.fileName;
         const value = {
-            photoPreviewURL, 
-            videoPreviewURL, 
-            handleChangePhoto: this.handleChangePhoto, 
-            handleUploadPhoto: this.handleUploadPhoto, 
-            handleChangeVideo: this.handleChangeVideo, 
-            handleUploadVideo: this.handleUploadVideo
+            fileName,
+            filePreviewURL, 
+            handleChangeFile: this.handleChangeFile, 
+            handleUploadFile: this.handleUploadFile, 
         }
-        return (<><Home key= {value.photoPreviewURL + value.videoPreviewURL} value = {value}/></>)
+        return (<><Home key= {filePreviewURL} value = {value}/></>)
     }
 
     returnLoadingPage = () => {
@@ -158,7 +141,7 @@ class Main extends React.Component {
             onClickHomeButton: this.onClickHomeButton,
             onClickShareButton: this.onClickShareButton,
         }
-        return (<><Result value = {value}/></>)
+        return (<><Result key={resMusicThumbnailURL + resMusicYoutubeURL} value = {value}/></>)
     }
 
     onClickHomeButton = () => {
