@@ -4,17 +4,26 @@ import Result from './Result';
 import Loading from './Loading';
 import Home from './Home';
 import fetch from 'node-fetch';
-import YTSearch from 'youtube-api-search'
+
+import YTSearch from 'youtube-api-search';
+
+// 구글 번역 API Key
 var api = "AIzaSyCGfStTcE6Tl-00sqxmJqIjM1AGaCk1oKc";
 var googleTranslate = require('google-translate')(api);
 
+// Last.fm API Key
 const LastFM = require('last-fm')
-const lastfm = new LastFM('6442e62dddbf0137f91a1862942fbbe2', {}) // Last.fm API Key
-const API_KEY = 'AIzaSyAyPhjPgWUCbGbUMCyl9vugwCZrsaUDWuo'         // Youtube API Key
+const lastfm = new LastFM('6442e62dddbf0137f91a1862942fbbe2', {}) 
 
+// Youtube API Key
+const API_KEY = 'AIzaSyAyPhjPgWUCbGbUMCyl9vugwCZrsaUDWuo'         
 const albumBucketName = "media-query-mediabucket-1i4slys4cekco";
 const bucketRegion = "ap-northeast-2";
 const IdentityPoolId = "ap-northeast-2:c3883d87-fb89-4147-bb5f-69a1d8714a71";
+
+// Azure API Key
+let subscriptionKey = '570122bd4a134b4ab9783831d345efd6'
+let endpoint = 'https://hackathon-face-recog.cognitiveservices.azure.com/face/v1.0/detect'
 
 AWS.config.update({
     region: bucketRegion,
@@ -84,11 +93,23 @@ class Main extends React.Component {
             return
         }
         if (this.checkFileSize({fileSize: file.raw.size})) {
-            alert("파일의 사이즈가 너무 큽니다! 10M이하로 넣어주세요");
+            alert("파일의 사이즈가 너무 큽니다! 20Mbyte이하로 넣어주세요");
             return
         }
-        this.uploadFile({file: file.raw, fileName: file.name})
+        if (this.checkIsVideo({fileType: file.type})) {
+            // azure로 보낸 다음 하이라이트 가져오기
+        } else {
+            this.uploadFileToAWS({file: file.raw, fileName: file.name});
+        }
+        // this.uploadFile({file: file.raw, fileName: file.name})
     };
+
+    checkIsVideo = ({fileType}) => {
+        if (['mp4', 'mov', 'flv'].includes(fileType)) {
+            return true
+        }
+        return false
+    }
 
     checkFileType = ({fileType}) => {
         if (['jpg', 'png', 'mp4', 'mov', 'flv'].includes(fileType)) {
@@ -98,7 +119,7 @@ class Main extends React.Component {
     }
 
     checkFileSize = ({fileSize}) => {
-        const maxFileSize = 10 * 1024 * 1024;
+        const maxFileSize = 20 * 1024 * 1024;
         if (fileSize > maxFileSize) {
             return true
         }
@@ -109,7 +130,7 @@ class Main extends React.Component {
         return `${Math.floor(Math.random() * 100000000)}`;
     }
 
-    uploadFile = ({file, fileName}) => {
+    uploadFileToAWS = ({file, fileName}) => {
         // Use S3 ManagedUpload class as it supports multipart uploads
         const key = fileName + '.' + file.name.split('.').pop()
         const upload = new AWS.S3.ManagedUpload({
@@ -123,17 +144,55 @@ class Main extends React.Component {
         const promise = upload.promise();
         promise
             .then(res => {
-                console.log(key)
                 this.getResponseFromServer(key);
                 return;
             })
             .catch((e) => `err: ${e.message}`);
     }
 
+    uploadFileToAzure = async (fileNameWithType) => {
+        console.log(fileNameWithType);
+        const imageURL = `https://media-query-mediabucket-1i4slys4cekco.s3.ap-northeast-2.amazonaws.com/${fileNameWithType}`;
+        const params = new URLSearchParams({ 
+            detectionModel: 'detection_01',
+            returnFaceLandmarks: false,
+            returnFaceAttributes: 'emotion',
+            recognitionModel: 'recognition_03',
+            returnRecognitionModel: false,
+            faceIdTimeToLive: 86400,
+            returnFaceId: true
+        })
+        let json = {}
+        const body = JSON.stringify({
+            url: imageURL,
+        })
+        try {
+            const res = await fetch(endpoint + "?" + params, {
+                method: 'post', 
+                headers: { 'Ocp-Apim-Subscription-Key': subscriptionKey, 'Content-type': 'application/json' }, 
+                body: body,
+            });
+            console.log(res)
+            json = await res.json();
+        } catch (error) {
+            console.log(error)
+        }
+        if (json.length >= 1) {
+            const obj = json[0].faceAttributes.emotion;
+            let arr = Object.values(obj);
+            let max = Math.max(...arr);
+            if (max === 0) {
+                return "NO_KEYWORD"
+            } else {
+                return Object.keys(obj).find(key => obj[key] === max);
+            }
+        } else {
+            return "NO_KEYWORD"
+        }
+    }
+
     getRandomKeyWord = async (response) => {
         const labels = response.labels;
-        console.log(labels)
-        console.log(labels.length)
         const firstIndex = this.getRandomInt(0, labels.length);
         var secondIndex = this.getRandomInt(0, labels.length);
         while (firstIndex === secondIndex) {
@@ -143,8 +202,6 @@ class Main extends React.Component {
         var secondKeyword = labels[secondIndex];
         // firstKeyword = await this.getTranslatedKeyword(firstKeyword);
         // secondKeyword = await this.getTranslatedKeyword(secondKeyword);
-        console.log(firstKeyword)
-        console.log(secondKeyword)
         return {firstKeyword, secondKeyword};
     }
 
@@ -165,9 +222,15 @@ class Main extends React.Component {
     getResponseFromServer = async (fileNameWithType) => {
         this.showLoadingPage()
         try {
-            const __ = await this.sleep(3000);
+            const wait = await this.sleep(3500);
             const response = await this.getKeywordFromServer(fileNameWithType)
-            const {firstKeyword, secondKeyword} = await this.getRandomKeyWord(response);
+            var emotionKeyword = await this.uploadFileToAzure(fileNameWithType);
+            var {firstKeyword, secondKeyword} = await this.getRandomKeyWord(response);
+            if (emotionKeyword !== "NO_KEYWORD") {
+                secondKeyword = emotionKeyword
+            }
+            console.log(emotionKeyword);
+            console.log(`${firstKeyword} ${secondKeyword}`);
             this.fetchTracklist(`${firstKeyword} ${secondKeyword}`);
         } catch (error) {
             console.log(error)
@@ -184,8 +247,6 @@ class Main extends React.Component {
             json = await res.json();
         } catch (error) {
             console.log(error)
-        } finally {
-            console.log("end");
         }
         return json
     }
@@ -268,7 +329,6 @@ class Main extends React.Component {
 
       // Set states
     updateTopTrackinfo = (data) => {
-        console.log(data)
         let trackName, trackArtist;
         if (!data.result[0]) {
             trackName = "Kpop";
