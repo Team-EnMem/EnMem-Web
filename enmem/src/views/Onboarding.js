@@ -1,39 +1,39 @@
 import React from 'react';
 import Main from './Main';
-import styled from 'styled-components';
+import styled from "styled-components";
 
 class Onboarding extends React.Component {
-​
+
     constructor(props){
         super(props);
-​
+
         this.state = {
             isOnboardingPage: true,
         };
     }
-​
+
     componentDidMount() {
-​
+
     }
-​
+
     componentDidUpdate(preProps, prevState) {
-​
+
     }
-​
+
     componentWillUnmount() {
-​
+
     }
-​
+
     onClickStartButton = () => {
         this.showHomePage()
     }
-​
+
     showHomePage = () => {
         this.setState({
             isOnboardingPage: false
         });
     }
-​
+
     returnOnboardingPage = () => {
         return (
                 <BContainer>
@@ -54,8 +54,8 @@ class Onboarding extends React.Component {
                 </BContainer>
         );
     }
-​
-​
+
+
     render() {
         const {isOnboardingPage} = this.state;
         return (
@@ -66,7 +66,7 @@ class Onboarding extends React.Component {
     }
     
 }
-​
+
 const Text_1 = styled.text`
 position: absolute;
 width: 220px;
@@ -80,7 +80,7 @@ font-size: 14px;
 line-height: 21px;
 text-align: center;
 letter-spacing: -0.04em;
-​
+
 color: #817F8D;
 `;
 const Text_2 = styled.text`
@@ -96,9 +96,9 @@ font-size: 14px;
 line-height: 21px;
 text-align: center;
 letter-spacing: -0.04em;
-​
+
 color: #E8E6F2;
-​
+
 `;
 const BContainer = styled.div`
 position: absolute;
@@ -108,7 +108,7 @@ width: 100%;
 height: 100%;
 background: #E5E5E5;
 `;
-​
+
 const Buttonimg = styled.div`
 position: absolute;
 width: 240px;
@@ -119,7 +119,7 @@ background: url(https://i.imgur.com/9PJ1964.png);
 background-size: cover;
 z-index: 1;
 `;
-​
+
 const Styledbutton = styled.button`
 position: absolute;
 width: 180px;
@@ -133,7 +133,7 @@ box-shadow: 0px 0px 30px rgba(248, 118, 91, 0.2);
 background-size: cover;
 z-index: 0;
 `;
-​
+
 const Container = styled.div`
 position: relative;
 width: 375px;
@@ -161,7 +161,7 @@ background: rgba(222, 233, 255, 0.25);
 border-radius: 50%;
 `;
 const Backimg_4 = styled.div`
-​
+
 position: absolute;
 width: 127px;
 height: 127px;
@@ -170,8 +170,8 @@ top: 159px;
 border-radius: 50%;
 background: rgba(222, 233, 255, 0.35);
 `;
-​
-​
+
+
 const Backimg = styled.div`
 position: absolute;
 width: 221px;
@@ -182,5 +182,5 @@ border-radius: 50%;
 background: #FFFF00;
 background: rgba(222, 233, 255, 0.4);
 `;
-​
+
 export default Onboarding;

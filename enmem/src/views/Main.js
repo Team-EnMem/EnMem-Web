@@ -10,7 +10,7 @@ var googleTranslate = require('google-translate')(api);
 
 const LastFM = require('last-fm')
 const lastfm = new LastFM('6442e62dddbf0137f91a1862942fbbe2', {}) // Last.fm API Key
-const API_KEY = 'AIzaSyAyPhjPgWUCbGbUMCyl9vugwCZrsaUDWuo'         // Youtube API Key
+const API_KEY = 'AIzaSyBu0Mxg6dWgI1yu3RH0Bu23ul0Hj8F6ByE'         // Youtube API Key
 
 const albumBucketName = "media-query-mediabucket-1i4slys4cekco";
 const bucketRegion = "ap-northeast-2";
