@@ -14,7 +14,7 @@ class Home extends React.Component {
 
     returnFilePreview = ({fileType, filePreviewURL}) => {
         console.log(fileType);
-        if (['mp4', 'mov', 'avi', 'mkv'].includes(fileType.split('/').pop())) {
+        if (['video'].includes(fileType.split('/').shift())) {
             return (
                 <>
                     <video width="320" height="240" controls>
