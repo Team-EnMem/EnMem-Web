@@ -9,10 +9,11 @@ class Result extends React.PureComponent {
         super(props);
         console.log(props)
         this.state = {
+            fileKind: this.props.value.kind,
+            filePreviewURL: this.props.value.preview, 
             youtubeID: this.props.value.youtubeID,
             artist: this.props.value.artist,
             title: this.props.value.title,
-            preview: this.props.value.preview,
             onClickHomeButton: this.props.value.onClickHomeButton,
             onClickShareButton: this.props.value.onClickShareButton,
         };
@@ -26,23 +27,40 @@ class Result extends React.PureComponent {
         return "https://www.youtube.com/watch/" + youtubeID
     }
 
+    returnFilePreview = ({fileKind, filePreviewURL}) => {
+        console.log(fileKind)
+        console.log(filePreviewURL)
+        if (['video'].includes(fileKind)) {
+            return (
+                <>
+                    <video width="500" height="500" controls>
+                    <source src={filePreviewURL} type="video/mp4" />
+                    </video>
+                </>
+            )
+        }
+    }
+
     render(){
-        const {youtubeID, artist, title, preview, onClickHomeButton, onClickShareButton} = this.state
+        const {fileKind, youtubeID, artist, title, filePreviewURL, onClickHomeButton, onClickShareButton} = this.state
         return (
-            <BContainer>
-                <Container>
-                    <Blacklayer>
-                        <div>
-                            <a href={this.getYouTubeURL(youtubeID)}></a>
-                            <Text_1>{artist}</Text_1>
-                            <Text_2>{title}</Text_2>
-                            <iframe style= {{visibility: 'hidden'}} width="0" height="0" src={this.getYouTubeEmbedURL(youtubeID)} allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
-                            <Styledbutton_1 backgroundImage={homebutton} onClick={onClickHomeButton}/>
-                            <Styledbutton_2 backgroundImage={sharebutton} onClick={onClickShareButton}/>
-                        </div>
-                    </Blacklayer>
-                </Container>
-            </BContainer>
+            <>
+                <BContainer>
+                    <Container>
+                        <Blacklayer>
+                            <div>
+                                {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
+                                <a href={this.getYouTubeURL(youtubeID)}></a>
+                                <Text_1>{artist}</Text_1>
+                                <Text_2>{title}</Text_2>
+                                <iframe style= {{visibility: 'hidden'}} width="0" height="0" src={this.getYouTubeEmbedURL(youtubeID)} allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                                <Styledbutton_1 backgroundImage={homebutton} onClick={onClickHomeButton}/>
+                                <Styledbutton_2 backgroundImage={sharebutton} onClick={onClickShareButton}/>
+                            </div>
+                        </Blacklayer>
+                    </Container>
+                </BContainer>
+            </>
         );
     }
 }
