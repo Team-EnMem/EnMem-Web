@@ -6,6 +6,7 @@ class Home extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            fileKind: this.props.value.kind,
             fileType: this.props.value.type,
             filePreviewURL: this.props.value.preview, 
             handleChangeFile: this.props.value.handleChangeFile, 
@@ -13,12 +14,11 @@ class Home extends React.Component {
         };
     }
 
-    returnFilePreview = ({fileType, filePreviewURL}) => {
-        console.log(fileType);
-        if (['video'].includes(fileType.split('/').shift())) {
+    returnFilePreview = ({fileKind, filePreviewURL}) => {
+        if (['video'].includes(fileKind)) {
             return (
                 <>
-                    <video width="320" height="240" controls>
+                    <video width="500" height="500" controls>
                     <source src={filePreviewURL} type="video/mp4" />
                     </video>
                 </>
@@ -26,7 +26,7 @@ class Home extends React.Component {
         } else { // '사진'
             return (
                 <>
-                    <img src = {filePreviewURL} alt = {filePreviewURL}/>
+                    <img src = {filePreviewURL} alt = {filePreviewURL} width="500" height="500"/>
                 </>
             )
         }
@@ -40,6 +40,7 @@ class Home extends React.Component {
 
     render() {
         const {
+            fileKind,
             fileType,
             filePreviewURL, 
             handleChangeFile, 
@@ -55,9 +56,9 @@ class Home extends React.Component {
                     onChange={handleChangeFile}
                 />
                 <br />
-                <button onClick={handleUploadFile}>사진 업로드</button>
+                <button onClick={handleUploadFile}>사진/영상 업로드</button>
                 <br / >
-                {filePreviewURL.length ? this.returnFilePreview({fileType, filePreviewURL}) : this.returnEmptyTag()}
+                {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
             </>
         );
     }
