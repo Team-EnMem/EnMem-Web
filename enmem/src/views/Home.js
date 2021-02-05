@@ -5,20 +5,16 @@ class Home extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            fileName: this.props.value.fileName,
-            filePreviewURL: this.props.value.filePreviewURL, 
+            fileType: this.props.value.type,
+            filePreviewURL: this.props.value.preview, 
             handleChangeFile: this.props.value.handleChangeFile, 
             handleUploadFile: this.props.value.handleUploadFile, 
         };
     }
 
-    getFileExtenstion = (fileName) => {
-        return fileName.split('.').pop();
-    }
-
-    returnFilePreview = ({fileName, filePreviewURL}) => {
-        const fileExtension = this.getFileExtenstion(fileName);
-        if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) {
+    returnFilePreview = ({fileType, filePreviewURL}) => {
+        console.log(fileType);
+        if (['mp4', 'mov', 'avi', 'mkv'].includes(fileType.split('/').pop())) {
             return (
                 <>
                     <video width="320" height="240" controls>
@@ -42,7 +38,7 @@ class Home extends React.Component {
 
     render() {
         const {
-            fileName,
+            fileType,
             filePreviewURL, 
             handleChangeFile, 
             handleUploadFile, 
@@ -59,7 +55,7 @@ class Home extends React.Component {
                 <br />
                 <button onClick={handleUploadFile}>사진 업로드</button>
                 <br / >
-                {filePreviewURL.length ? this.returnFilePreview({fileName, filePreviewURL}) : this.returnEmptyTag()}
+                {filePreviewURL.length ? this.returnFilePreview({fileType, filePreviewURL}) : this.returnEmptyTag()}
             </>
         );
     }

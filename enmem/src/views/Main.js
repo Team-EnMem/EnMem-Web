@@ -32,7 +32,8 @@ class Main extends React.Component {
             isLoadingPage: false,
             isResultPage: false,
             file: {
-                fileName: "",
+                name: "",
+                type: "",
                 preview: "",
                 raw: "",
             },
@@ -54,7 +55,8 @@ class Main extends React.Component {
             const fileName = this.generateRandomFileName()
             this.setState({
                 file: {
-                    fileName,
+                    name: fileName,
+                    type: e.target.files[0].type,
                     preview: URL.createObjectURL(e.target.files[0]),
                     raw: e.target.files[0]
                 }
@@ -70,7 +72,7 @@ class Main extends React.Component {
             alert("파일의 사이즈가 너무 큽니다! 10M이하로 넣어주세요");
             return
         }
-        this.uploadFile({file: file.raw, fileName: file.fileName, completion: this.getResponseFromServer})
+        this.uploadFile({file: file.raw, fileName: file.name, completion: this.getResponseFromServer})
     };
 
     checkFileSize = ({fileSize}) => {
@@ -118,15 +120,14 @@ class Main extends React.Component {
 
     returnHomePage = () => {
         const {file} = this.state;
-        const filePreviewURL = file.preview;
-        const fileName = file.fileName;
+        const {type, preview} = file;
         const value = {
-            fileName,
-            filePreviewURL, 
+            type: type,
+            preview: preview, 
             handleChangeFile: this.handleChangeFile, 
             handleUploadFile: this.handleUploadFile, 
         }
-        return (<><Home key= {filePreviewURL} value = {value}/></>)
+        return (<><Home key= {preview} value = {value}/></>)
     }
 
     returnLoadingPage = () => {
