@@ -1,39 +1,38 @@
 import React from 'react';
 
+
 class Home extends React.Component {
 
     constructor(props){
         super(props);
         this.state = {
-            photoPreviewURL: this.props.value.photoPreviewURL, 
-            videoPreviewURL: this.props.value.videoPreviewURL, 
-            handleChangePhoto: this.props.value.handleChangePhoto, 
-            handleUploadPhoto: this.props.value.handleUploadPhoto, 
-            handleChangeVideo: this.props.value.handleChangeVideo, 
-            handleUploadVideo: this.props.value.handleUploadVideo
+            fileKind: this.props.value.kind,
+            fileType: this.props.value.type,
+            filePreviewURL: this.props.value.preview, 
+            handleChangeFile: this.props.value.handleChangeFile, 
+            handleUploadFile: this.props.value.handleUploadFile, 
         };
     }
 
-    returnPhotoPreview = (photoPreviewURL) => {
-        console.log("!!")
-
-        return (
-            <>
-                <img src = {photoPreviewURL}/>
-            </>
-        )
+    returnFilePreview = ({fileKind, filePreviewURL}) => {
+        if (['video'].includes(fileKind)) {
+            return (
+                <>
+                    <video width="500" height="500" controls>
+                    <source src={filePreviewURL} type="video/mp4" />
+                    </video>
+                </>
+            )
+        } else { // '사진'
+            return (
+                <>
+                    <img src = {filePreviewURL} alt = {filePreviewURL} width="500" height="500"/>
+                </>
+            )
+        }
+        
     }
 
-    returnVideoPreview = (videoPreviewURL) => {
-        console.log(videoPreviewURL)
-        return (
-            <>
-                <video width="320" height="240" controls>
-                <source src={videoPreviewURL} type="video/mp4" />
-                </video>
-            </>
-        )
-    }
 
     returnEmptyTag = () => {
         return (<></>)
@@ -41,12 +40,11 @@ class Home extends React.Component {
 
     render() {
         const {
-            photoPreviewURL, 
-            videoPreviewURL, 
-            handleChangePhoto, 
-            handleUploadPhoto, 
-            handleChangeVideo, 
-            handleUploadVideo
+            fileKind,
+            fileType,
+            filePreviewURL, 
+            handleChangeFile, 
+            handleUploadFile, 
         } = this.state
 
         return (
@@ -55,22 +53,12 @@ class Home extends React.Component {
                 <input
                     type="file"
                     id="upload-photo-button"
-                    onChange={handleChangePhoto}
+                    onChange={handleChangeFile}
                 />
                 <br />
-                <button onClick={handleUploadPhoto}>사진 업로드</button>
-                <br />
-                <input
-                    type="file"
-                    id="upload-video-button"
-                    onChange={handleChangeVideo}
-                />
-                <br />
-                <button onClick={handleUploadVideo}>동영상 업로드</button>
+                <button onClick={handleUploadFile}>사진/영상 업로드</button>
                 <br / >
-                {photoPreviewURL.length ? this.returnPhotoPreview(photoPreviewURL) : this.returnEmptyTag()}
-                <br / >
-                {videoPreviewURL.length ? this.returnVideoPreview(videoPreviewURL) : this.returnEmptyTag()}
+                {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
             </>
         );
     }
