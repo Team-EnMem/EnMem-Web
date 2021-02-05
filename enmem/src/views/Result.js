@@ -1,4 +1,5 @@
 import React from 'react';
+import  youtubeThumbnail from 'youtube-thumbnail';
 
 class Result extends React.PureComponent {
 
@@ -10,6 +11,13 @@ class Result extends React.PureComponent {
             onClickHomeButton: this.props.value.onClickHomeButton,
             onClickShareButton: this.props.value.onClickShareButton,
         };
+    }
+
+
+    getYouTubeThumbnail = (youtubeURL) => {
+        const thumbnail = youtubeThumbnail(youtubeURL);
+        console.log(thumbnail);
+        return thumbnail.high.url
     }
 
     render(){
@@ -26,8 +34,8 @@ class Result extends React.PureComponent {
                 </div>
                 <div>
                     <a href={youtubeURL}>
-                    <img src={thumbnailURL}
-                        alt="Visit the MDN site" />
+                    <img src={this.getYouTubeThumbnail(youtubeURL)}
+                        alt={youtubeURL} />
                     </a>
                     <br/>
                     <p> {youtubeURL} </p>
