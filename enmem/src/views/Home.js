@@ -7,7 +7,6 @@ class Home extends React.Component {
         super(props);
         this.state = {
             fileKind: this.props.value.kind,
-            fileType: this.props.value.type,
             filePreviewURL: this.props.value.preview, 
             handleChangeFile: this.props.value.handleChangeFile, 
             handleUploadFile: this.props.value.handleUploadFile, 
@@ -41,7 +40,6 @@ class Home extends React.Component {
     render() {
         const {
             fileKind,
-            fileType,
             filePreviewURL, 
             handleChangeFile, 
             handleUploadFile, 

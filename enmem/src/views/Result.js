@@ -4,10 +4,11 @@ class Result extends React.PureComponent {
     constructor(props){
         super(props);
         this.state = {
+            fileKind: this.props.value.kind,
+            filePreviewURL: this.props.value.preview, 
             youtubeID: this.props.value.youtubeID,
             artist: this.props.value.artist,
             title: this.props.value.title,
-            preview: this.props.value.preview,
             onClickHomeButton: this.props.value.onClickHomeButton,
             onClickShareButton: this.props.value.onClickShareButton,
         };
@@ -21,9 +22,29 @@ class Result extends React.PureComponent {
         return "https://www.youtube.com/watch/" + youtubeID
     }
 
+    returnFilePreview = ({fileKind, filePreviewURL}) => {
+        console.log(fileKind)
+        console.log(filePreviewURL)
+        if (['video'].includes(fileKind)) {
+            return (
+                <>
+                    <video width="500" height="500" controls>
+                    <source src={filePreviewURL} type="video/mp4" />
+                    </video>
+                </>
+            )
+        } else { // '사진'
+            return (
+                <>
+                    <img src = {filePreviewURL} alt = {filePreviewURL} width="500" height="500"/>
+                </>
+            )
+        }
+        
+    }
 
     render(){
-        const {youtubeID, artist, title, preview, onClickHomeButton, onClickShareButton} = this.state
+        const {fileKind, youtubeID, artist, title, filePreviewURL, onClickHomeButton, onClickShareButton} = this.state
         return (
             <>
                 <h1> 결과 페이지 </h1>
@@ -33,10 +54,7 @@ class Result extends React.PureComponent {
                     <br />
                     </div>
                 <div>
-                    <a href={this.getYouTubeURL(youtubeID)}>
-                    <img src={preview} width="500" height="500"
-                        alt={this.getYouTubeURL(youtubeID)} />
-                    </a>
+                    {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
                     <h4>{artist}</h4>
                     <h4>{title}</h4>
                     <br/>

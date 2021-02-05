@@ -1,22 +1,24 @@
 import React from 'react';
-import AWS, { ServerlessApplicationRepository } from 'aws-sdk'
 import Result from './Result';
 import Loading from './Loading';
 import Home from './Home';
+
+import AWS, { ServerlessApplicationRepository } from 'aws-sdk'
+import { BlobServiceClient } from "@azure/storage-blob";
+import YTSearch from 'youtube-api-search';
+import html2canvas from 'html2canvas';
 import fetch from 'node-fetch';
 
-import YTSearch from 'youtube-api-search';
-
-// 구글 번역 API Key
-var api = "AIzaSyCGfStTcE6Tl-00sqxmJqIjM1AGaCk1oKc";
-var googleTranslate = require('google-translate')(api);
+// // 구글 번역 API Key
+// var api = "AIzaSyCGfStTcE6Tl-00sqxmJqIjM1AGaCk1oKc";
+// var googleTranslate = require('google-translate')(api);
 
 // Last.fm API Key
 const LastFM = require('last-fm')
 const lastfm = new LastFM('6442e62dddbf0137f91a1862942fbbe2', {}) 
 
 // Youtube API Key
-const API_KEY = 'AIzaSyAyPhjPgWUCbGbUMCyl9vugwCZrsaUDWuo'         
+const API_KEY = 'AIzaSyCGfStTcE6Tl-00sqxmJqIjM1AGaCk1oKc'         
 const albumBucketName = "media-query-mediabucket-1i4slys4cekco";
 const bucketRegion = "ap-northeast-2";
 const IdentityPoolId = "ap-northeast-2:c3883d87-fb89-4147-bb5f-69a1d8714a71";
@@ -25,6 +27,7 @@ const IdentityPoolId = "ap-northeast-2:c3883d87-fb89-4147-bb5f-69a1d8714a71";
 let subscriptionKey = '570122bd4a134b4ab9783831d345efd6'
 let endpoint = 'https://hackathon-face-recog.cognitiveservices.azure.com/face/v1.0/detect'
 
+// AWS s3 설정
 AWS.config.update({
     region: bucketRegion,
     credentials: new AWS.CognitoIdentityCredentials({
@@ -93,15 +96,10 @@ class Main extends React.Component {
             return
         }
         if (this.checkFileSize({fileSize: file.raw.size})) {
-            alert("파일의 사이즈가 너무 큽니다! 20Mbyte이하로 넣어주세요");
+            alert("파일의 사이즈가 너무 큽니다! 10Mbyte이하로 넣어주세요");
             return
         }
-        if (this.checkIsVideo({fileType: file.type})) {
-            // azure로 보낸 다음 하이라이트 가져오기
-        } else {
-            this.uploadFileToAWS({file: file.raw, fileName: file.name});
-        }
-        // this.uploadFile({file: file.raw, fileName: file.name})
+        this.uploadFileToAWS({file: file.raw, fileName: file.name});
     };
 
     checkIsVideo = ({fileType}) => {
@@ -119,7 +117,7 @@ class Main extends React.Component {
     }
 
     checkFileSize = ({fileSize}) => {
-        const maxFileSize = 20 * 1024 * 1024;
+        const maxFileSize = 10 * 1024 * 1024;
         if (fileSize > maxFileSize) {
             return true
         }
@@ -130,7 +128,7 @@ class Main extends React.Component {
         return `${Math.floor(Math.random() * 100000000)}`;
     }
 
-    uploadFileToAWS = ({file, fileName}) => {
+    uploadFileToAWS = async ({file, fileName}) => {
         // Use S3 ManagedUpload class as it supports multipart uploads
         const key = fileName + '.' + file.name.split('.').pop()
         const upload = new AWS.S3.ManagedUpload({
@@ -141,13 +139,13 @@ class Main extends React.Component {
           }
         });
       
-        const promise = upload.promise();
-        promise
-            .then(res => {
-                this.getResponseFromServer(key);
-                return;
-            })
-            .catch((e) => `err: ${e.message}`);
+        try {
+            const uploaded = await upload.promise();
+            await this.getResponseFromServer({fileNameWithType: key, fileType: file.name.split('.').pop()});
+        } catch (error) {
+            console.log(error.message);
+        }
+        
     }
 
     uploadFileToAzure = async (fileNameWithType) => {
@@ -205,13 +203,13 @@ class Main extends React.Component {
         return {firstKeyword, secondKeyword};
     }
 
-    getTranslatedKeyword = (keyword) => {
-        return new Promise(resolve => {
-            googleTranslate.translate(keyword, 'ko', function(err, translation) {
-                resolve(translation.translatedText);
-            })
-        })   
-    }
+    // getTranslatedKeyword = (keyword) => {
+    //     return new Promise(resolve => {
+    //         googleTranslate.translate(keyword, 'ko', function(err, translation) {
+    //             resolve(translation.translatedText);
+    //         })
+    //     })   
+    // }
 
     getRandomInt = (min, max) => {
         min = Math.ceil(min);
@@ -219,10 +217,24 @@ class Main extends React.Component {
         return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
     }
 
-    getResponseFromServer = async (fileNameWithType) => {
+    waitForServer = async(fileType) => {
+        const isVideo = await new Promise(resolve => {
+            resolve(this.checkIsVideo({fileType: fileType}));
+        })
+        if (isVideo) {
+            console.log("video~~~")
+            await this.sleep(35000);
+        } else {
+            console.log("image~~~")
+            await this.sleep(5000);
+        }
+    }
+
+    getResponseFromServer = async ({fileNameWithType, fileType}) => {
         this.showLoadingPage()
+        console.log(fileType)
         try {
-            const wait = await this.sleep(3500);
+            await this.waitForServer(fileType);
             const response = await this.getKeywordFromServer(fileNameWithType)
             var emotionKeyword = await this.uploadFileToAzure(fileNameWithType);
             var {firstKeyword, secondKeyword} = await this.getRandomKeyWord(response);
@@ -245,6 +257,7 @@ class Main extends React.Component {
         try {
             const res = await fetch(url, {method: 'GET', headers: headers, });
             json = await res.json();
+            console.log(json)
         } catch (error) {
             console.log(error)
         }
@@ -270,11 +283,14 @@ class Main extends React.Component {
 
     returnResultPage = () => {
         const {file, topVideoID, topTrackName, topTrackArtist} = this.state;
+        const {kind, type, preview} = file;
         const value = {
+            kind: kind,
+            type: type,
+            preview: preview,
             youtubeID: topVideoID,
             artist: topTrackArtist,
             title: topTrackName,
-            preview: file.preview,
             onClickHomeButton: this.onClickHomeButton,
             onClickShareButton: this.onClickShareButton,
         }
@@ -286,7 +302,23 @@ class Main extends React.Component {
     }
 
     onClickShareButton = () => {
-        
+        this.shareForFacebook();
+    }
+
+    shareForFacebook = () => {
+        // html2canvas(document.getElementById('capture')).then(function(canvas) {
+        // });
+
+        const imgTag = document.createElement('img');
+        imgTag.setAttribute('src', this.state.file.preview);
+
+        document.getElementById('metaURL')
+        document.getElementById('metaType')
+        document.getElementById('metaTitle')
+        document.getElementById('metaDescription').setAttribute('content', `추천 받으신 음악은 ${this.state.topTrackName}입니다`)
+        document.getElementById('metaImage').setAttribute('content', `${this.state.file.preview}`)
+        const cUrl = `http://www.facebook.com/sharer/sharer.php?u=https://enmem.azurewebsites.net`
+        window.open(cUrl,'','width=600,height=300,top=100,left=100,scrollbars=yes');
     }
 
     showHomePage = () => {
@@ -343,12 +375,12 @@ class Main extends React.Component {
             topTrackArtist: trackArtist,
             topTrackKeyword: 'music'.concat(' ', JSON.stringify(trackName).replace(/\"/gi, ""), ' ', JSON.stringify(trackArtist).replace(/\"/gi, ""))
         }, () => {
-            this.videoSearch()
+            this.youtubeVideoSearch()
         });
     }
 
     // Search by keyword in Youtube and get vedio ID
-    videoSearch = () => {
+    youtubeVideoSearch = () => {
         YTSearch({key: API_KEY, term: this.state.topTrackKeyword}, (videos) => {
             let videoID;
             if (!videos[0]) {
