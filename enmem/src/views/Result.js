@@ -36,7 +36,9 @@ class Result extends React.PureComponent {
         } else { // '사진'
             return (
                 <>
-                    <img src = {filePreviewURL} alt = {filePreviewURL} width="500" height="500"/>
+                    <a href={this.getYouTubeURL(this.state.youtubeID)}>
+                    <img src = {filePreviewURL} alt = {this.getYouTubeURL(this.state.youtubeID)} width="500" height="500"/>
+                    </a>
                 </>
             )
         }
