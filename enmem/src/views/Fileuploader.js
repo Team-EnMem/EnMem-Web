@@ -35,8 +35,6 @@ const FileUploader = props => {
     props.handleFile(fileUploaded);
   };
 
-    console.log(props.handleChangeFile)
-
   return (
     <>
       <Button onClick={handleClick}>

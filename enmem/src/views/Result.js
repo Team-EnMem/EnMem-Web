@@ -28,8 +28,6 @@ class Result extends React.PureComponent {
     }
 
     returnFilePreview = ({fileKind, filePreviewURL}) => {
-        console.log(fileKind)
-        console.log(filePreviewURL)
         if (['video'].includes(fileKind)) {
             return (
                 <>
