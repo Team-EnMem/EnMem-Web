@@ -46,21 +46,23 @@ class Result extends React.PureComponent {
         return (
             <>
                 <BContainer>
-                    <Container>
-                        <Blacklayer>
-                            <div>
-                                <FilePreview>
-                                    {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
-                                </FilePreview>
-                                <a href={this.getYouTubeURL(youtubeID)}></a>
-                                <Text_1>{artist}</Text_1>
-                                <Text_2>{title}</Text_2>
-                                <iframe style= {{visibility: 'hidden'}} width="0" height="0" src={this.getYouTubeEmbedURL(youtubeID)} allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
-                                <Styledbutton_1 backgroundImage={homebutton} onClick={onClickHomeButton}/>
-                                <Styledbutton_2 backgroundImage={sharebutton} onClick={onClickShareButton}/>
-                            </div>
-                        </Blacklayer>
-                    </Container>
+                    <ContainerA>
+                        <Container>
+                            <Blacklayer>
+                                <div>
+                                    <FilePreview>
+                                        {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
+                                    </FilePreview>
+                                    <a href={this.getYouTubeURL(youtubeID)}></a>
+                                    <Text_1>{artist}</Text_1>
+                                    <Text_2>{title}</Text_2>
+                                    <iframe style= {{visibility: 'hidden'}} width="0" height="0" src={this.getYouTubeEmbedURL(youtubeID)} allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                                    <Styledbutton_1 backgroundImage={homebutton} onClick={onClickHomeButton}/>
+                                    <Styledbutton_2 backgroundImage={sharebutton} onClick={onClickShareButton}/>
+                                </div>
+                            </Blacklayer>
+                        </Container>
+                    </ContainerA>
                 </BContainer>
             </>
         );
@@ -155,6 +157,15 @@ position: relative;
 width: 375px;
 height: 812px;
 background: rgba(0, 0, 0, 0.3);
+background-size: cover;
+`;
+
+const ContainerA = styled.div`
+position: relative;
+width: 375px;
+height: 812px;
+border: 2px solid black;
+background: url(https://media.giphy.com/media/wSYE7n6pk9dqRXzitR/giphy.gif);
 background-size: cover;
 `;
 
