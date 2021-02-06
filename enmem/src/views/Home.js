@@ -7,6 +7,7 @@ class Home extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            isFileUploader: this.props.value.isFileUploader,
             fileKind: this.props.value.kind,
             fileType: this.props.value.type,
             filePreviewURL: this.props.value.preview,
@@ -45,6 +46,7 @@ class Home extends React.Component {
 
     render() {
         const {
+            isFileUploader,
             fileKind,
             fileType,
             filePreviewURL, 
@@ -52,11 +54,11 @@ class Home extends React.Component {
             handleUploadFile, 
         } = this.state
 
-
+        console.log(isFileUploader);
         return (
             <BContainer>
                     <Container>
-                        <FileUploader handleChangeFile={handleChangeFile}></FileUploader>
+                        {isFileUploader ? <FileUploader handleChangeFile={handleChangeFile}></FileUploader> : this.returnEmptyTag()}
                         <br />
                         <Styledbutton_2 onClick={handleUploadFile}>
                             <Text_1>

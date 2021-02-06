@@ -33,7 +33,7 @@ class Result extends React.PureComponent {
         if (['video'].includes(fileKind)) {
             return (
                 <>
-                    <video width="500" height="500" controls>
+                    <video width="350" height="350" controls>
                     <source src={filePreviewURL} type="video/mp4" />
                     </video>
                 </>
