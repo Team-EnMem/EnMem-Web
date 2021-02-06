@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from "styled-components";
 import FileUploader from "./Fileuploader";
+import ReUploader from "./Reuploader";
 
 class Home extends React.Component {
 
@@ -13,9 +14,7 @@ class Home extends React.Component {
             filePreviewURL: this.props.value.preview,
             handleChangeFile: this.props.value.handleChangeFile,
             handleUploadFile: this.props.value.handleUploadFile,
-        };
-
-        
+        };        
     }
 
     
@@ -59,6 +58,7 @@ class Home extends React.Component {
             <BContainer>
                     <Container>
                         {isFileUploader ? <FileUploader handleChangeFile={handleChangeFile}></FileUploader> : this.returnEmptyTag()}
+                        {isFileUploader ? this.returnEmptyTag() : <ReUploader handleChangeFile={handleChangeFile}></ReUploader>}
                         <br />
                         <Styledbutton_2 onClick={handleUploadFile}>
                             <Text_1>
@@ -66,12 +66,21 @@ class Home extends React.Component {
                             </Text_1>
                         </Styledbutton_2>
                         <br />
-                    {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
+                    <FilePreview>
+                        {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
+                    </FilePreview>
                 </Container>
             </BContainer>
         );
     }
 }
+
+const FilePreview = styled.div`
+position: absolute;
+left: 12px;
+top: 80px;
+z-index:0;
+`
 
 const Text_1 = styled.text`
 position: absolute;
@@ -127,6 +136,8 @@ top: 679px;
 background: rgba(255, 255, 255, 0.6);
 box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.08);
 border-radius: 40px;
+border-style: solid;
+border-color: rgba(255, 255, 255, 0.1);
 `;
 
 const Styledbutton = styled.button`
@@ -136,6 +147,8 @@ height: 180px;
 left: 97px;
 top: 186px;
 border-radius: 50%;
+border-style: solid;
+border-color: white;
 background: #FFFFFF;
 background: url(https://i.imgur.com/Kh6kcqJ.png);
 box-shadow: 0px 0px 30px rgba(248, 118, 91, 0.2);
@@ -151,6 +164,7 @@ border: 2px solid black;
 background: url(https://media.giphy.com/media/wSYE7n6pk9dqRXzitR/giphy.gif);
 background-size: cover;
 `;
+
 const Backimg_2 = styled.div`
 position: absolute;
 width: 81px;
@@ -160,6 +174,7 @@ top: 313px;
 border-radius: 50%;
 background: rgba(222, 233, 255, 0.6);
 `;
+
 const Backimg_3 = styled.div`
 position: absolute;
 width: 337px;
@@ -179,7 +194,6 @@ top: 159px;
 border-radius: 50%;
 background: rgba(222, 233, 255, 0.35);
 `;
-
 
 const Backimg = styled.div`
 position: absolute;

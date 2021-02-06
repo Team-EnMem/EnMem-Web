@@ -49,7 +49,9 @@ class Result extends React.PureComponent {
                     <Container>
                         <Blacklayer>
                             <div>
-                                {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
+                                <FilePreview>
+                                    {filePreviewURL.length ? this.returnFilePreview({fileKind, filePreviewURL}) : this.returnEmptyTag()}
+                                </FilePreview>
                                 <a href={this.getYouTubeURL(youtubeID)}></a>
                                 <Text_1>{artist}</Text_1>
                                 <Text_2>{title}</Text_2>
@@ -64,6 +66,12 @@ class Result extends React.PureComponent {
         );
     }
 }
+
+const FilePreview = styled.div`
+position: absolute;
+left: 12px;
+top: 220px;
+`
 
 const Text_1 = styled.text`
 position: absolute;

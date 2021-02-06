@@ -136,6 +136,8 @@ height: 180px;
 left: 97px;
 top: 186px;
 border-radius: 50%;
+border-style: solid;
+border-color: rgba(255, 255, 255, 1);
 background: #FFFFFF;
 background: url(https://i.imgur.com/Kh6kcqJ.png);
 box-shadow: 0px 0px 30px rgba(248, 118, 91, 0.2);
