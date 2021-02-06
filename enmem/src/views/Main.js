@@ -18,7 +18,7 @@ const LastFM = require('last-fm')
 const lastfm = new LastFM('6442e62dddbf0137f91a1862942fbbe2', {}) 
 
 // Youtube API Key
-const API_KEY = 'AIzaSyCGfStTcE6Tl-00sqxmJqIjM1AGaCk1oKc'         
+const API_KEY = 'AIzaSyCZKFDX9D1gFEPbqR9_PYVsrGIBJH_x9Ic'         
 const albumBucketName = "media-query-mediabucket-1i4slys4cekco";
 const bucketRegion = "ap-northeast-2";
 const IdentityPoolId = "ap-northeast-2:c3883d87-fb89-4147-bb5f-69a1d8714a71";
