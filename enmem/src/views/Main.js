@@ -151,8 +151,16 @@ class Main extends React.Component {
         
     }
 
+    deleteFileOnAWS = (photoKey) => {
+        s3.deleteObject({ Key: photoKey }, function(err, data) {
+          if (err) {
+            return console.log("There was an error deleting your photo");
+          } 
+          console.log(`${photoKey} 성공적으로 삭제 되었습니다.!`);
+        });
+      }
+
     uploadFileToAzure = async (fileNameWithType) => {
-        console.log(fileNameWithType);
         const imageURL = `https://media-query-mediabucket-1i4slys4cekco.s3.ap-northeast-2.amazonaws.com/${fileNameWithType}`;
         const params = new URLSearchParams({ 
             detectionModel: 'detection_01',
@@ -173,7 +181,6 @@ class Main extends React.Component {
                 headers: { 'Ocp-Apim-Subscription-Key': subscriptionKey, 'Content-type': 'application/json' }, 
                 body: body,
             });
-            console.log(res)
             json = await res.json();
         } catch (error) {
             console.log(error)
@@ -235,7 +242,6 @@ class Main extends React.Component {
 
     getResponseFromServer = async ({fileNameWithType, fileType}) => {
         this.showLoadingPage()
-        console.log(fileType)
         try {
             await this.waitForServer(fileType);
             const response = await this.getKeywordFromServer(fileNameWithType)
@@ -348,6 +354,9 @@ class Main extends React.Component {
             isResultPage: true,
             videos: videos,
             topVideoID: topVideoID,
+        }, () => {
+            const fileKey = `${this.state.file.name}.${this.state.file.type}`
+            this.deleteFileOnAWS(fileKey);
         });
     }
 

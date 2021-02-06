@@ -16,7 +16,6 @@ class Home extends React.Component {
             handleUploadFile: this.props.value.handleUploadFile,
         };        
     }
-
     
     returnFilePreview = ({fileKind, filePreviewURL}) => {
         if (['video'].includes(fileKind)) {
@@ -38,7 +37,6 @@ class Home extends React.Component {
         
     }
 
-
     returnEmptyTag = () => {
         return (<></>)
     }
@@ -53,7 +51,6 @@ class Home extends React.Component {
             handleUploadFile, 
         } = this.state
 
-        console.log(isFileUploader);
         return (
             <BContainer>
                     <Container>
