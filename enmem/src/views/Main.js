@@ -46,6 +46,7 @@ class Main extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            showOnboardingPage: this.props.value.showOnboardingPage,
             isFileUploader: true,
             isHomePage: true,
             isLoadingPage: false,
@@ -301,7 +302,7 @@ class Main extends React.Component {
     }
 
     onClickHomeButton = () => {
-        this.showHomePage()
+        this.state.showOnboardingPage();
     }
 
     onClickShareButton = () => {

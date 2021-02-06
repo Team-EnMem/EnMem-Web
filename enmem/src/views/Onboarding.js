@@ -34,6 +34,12 @@ class Onboarding extends React.Component {
         });
     }
 
+    showOnboardingPage = () => {
+        this.setState({
+            isOnboardingPage: true
+        })
+    }
+
     returnOnboardingPage = () => {
         return (
                 <BContainer>
@@ -58,9 +64,12 @@ class Onboarding extends React.Component {
 
     render() {
         const {isOnboardingPage} = this.state;
+        const value = {
+            showOnboardingPage: this.showOnboardingPage
+        }
         return (
             <>
-                {isOnboardingPage ? this.returnOnboardingPage() : <Main/>}
+                {isOnboardingPage ? this.returnOnboardingPage() : <Main value = {value}/>}
             </>
         );
     }
